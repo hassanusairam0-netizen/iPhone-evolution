@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>iPhone Evolution</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one-screen showroom. Info column left, rotating 3D stage right, year rail along the bottom. Single dark look by choice. */
+:root{
+  --ink:#0a0b0e; --panel:#13151a; --line:#252831; --fg:#eceef2; --mute:#8d929e;
+  --accent:#e8743b;
+  --display:"Archivo",system-ui,sans-serif; --body:"Archivo",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{margin:0;background:var(--ink);color:var(--fg);font-family:var(--body);overflow-x:hidden;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));box-sizing:border-box}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{display:grid;grid-template-rows:auto 1fr auto;min-height:100%;max-width:1320px;margin:0 auto;gap:8px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-block:16px 4px}
+.brand{font-family:var(--display);font-weight:700;font-stretch:112%;letter-spacing:.01em;font-size:15px;display:flex;align-items:center;gap:10px}
+.brand svg{width:16px;height:16px;fill:var(--fg)}
+.credit{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg);
+  padding:8px 14px;border:1px solid var(--line);border-radius:99px;background:var(--panel);white-space:nowrap}
+.credit b{color:var(--accent);font-weight:500;transition:color .6s}
+main{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:24px;align-items:center;min-height:0}
+.info{display:flex;flex-direction:column;gap:18px;min-width:0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.tag{color:var(--ink);background:var(--accent);padding:2px 8px;border-radius:4px;letter-spacing:.08em;transition:background .6s}
+h1{font-family:var(--display);font-stretch:72%;font-weight:800;font-size:clamp(44px,6vw,76px);line-height:.92;margin:0;text-wrap:balance;letter-spacing:-.01em}
+.lede{font-size:16px;line-height:1.55;color:#c4c8d1;margin:0;max-width:38ch}
+dl{display:grid;grid-template-columns:auto 1fr;gap:10px 18px;margin:0;padding-top:16px;border-top:1px solid var(--line)}
+dt{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);padding-top:2px}
+dd{margin:0;font-size:15px;font-variant-numeric:tabular-nums}
+.swatches{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.sw{width:26px;height:26px;border-radius:50%;border:2px solid transparent;padding:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);transition:transform .2s}
+.sw[aria-pressed="true"]{border-color:var(--fg);transform:scale(1.12)}
+.swname{font-family:var(--mono);font-size:12px;color:var(--mute);margin-left:4px}
+
+.stage{position:relative;height:min(68vh,620px);min-height:440px;border-radius:28px;overflow:hidden;
+  background:radial-gradient(120% 90% at 50% 10%,#171a21 0%,var(--ink) 70%);border:1px solid var(--line);touch-action:none;cursor:grab}
+.stage:active{cursor:grabbing}
+.bigyear{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-stretch:62%;
+  font-size:clamp(160px,30vw,380px);line-height:1;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.09);user-select:none;pointer-events:none;letter-spacing:-.02em}
+.glow{position:absolute;left:50%;top:50%;width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:50%;
+  background:radial-gradient(circle,var(--accent) 0%,transparent 62%);opacity:.22;filter:blur(30px);transition:background .8s;pointer-events:none}
+.floor{position:absolute;left:50%;bottom:10%;width:260px;height:30px;margin-left:-130px;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.75),transparent);pointer-events:none}
+.scene{position:absolute;inset:0;perspective:1700px;display:grid;place-items:center;pointer-events:none}
+.fit{transition:opacity .28s,transform .28s;transform-style:preserve-3d}
+.fit.swap{opacity:0;transform:scale(.88) translateY(14px)}
+.rot{transform-style:preserve-3d}
+.phone{position:relative;transform-style:preserve-3d}
+.phone>div{position:absolute}
+.ghost{position:absolute;left:50%;top:50%;border:1.5px dashed rgba(255,255,255,.35);pointer-events:none;transition:opacity .3s}
+.ghost span{position:absolute;bottom:-22px;left:0;right:0;text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--mute);text-transform:uppercase;white-space:nowrap}
+.face{overflow:hidden;backface-visibility:hidden}
+.bz{position:absolute;inset:0}
+.spk{position:absolute;left:50%;transform:translateX(-50%);background:#222;border-radius:9px;box-shadow:inset 0 1px 2px #000}
+.scr{position:absolute;overflow:hidden;background:#000}
+.hb{position:absolute;border-radius:50%;box-shadow:inset 0 0 0 1.5px rgba(128,128,128,.55),inset 0 2px 4px rgba(0,0,0,.35)}
+.hb::after{content:"";position:absolute;inset:32%;border:1.2px solid rgba(140,140,140,.6);border-radius:22%}
+.hb.tid::after{display:none}
+.wp{position:absolute;inset:0}
+.grid{position:absolute;display:grid;grid-template-columns:repeat(4,1fr)}
+.grid i{aspect-ratio:1;border-radius:22%;box-shadow:inset 0 -3px 6px rgba(0,0,0,.25),inset 0 2px 3px rgba(255,255,255,.35)}
+.sb{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;color:#fff;font-family:var(--body);font-weight:600;opacity:.9}
+.clk{position:absolute;left:0;right:0;text-align:center;color:#fff;font-family:var(--display);font-weight:600;font-stretch:90%;text-shadow:0 2px 12px rgba(0,0,0,.25)}
+.dt{position:absolute;left:0;right:0;text-align:center;color:rgba(255,255,255,.85);font-weight:500}
+.notch,.isl,.punch{position:absolute;background:#000;left:50%;transform:translateX(-50%)}
+.isl{border-radius:99px}
+.punch{border-radius:50%}
+.crease{position:absolute;top:0;bottom:0;left:50%;width:8px;margin-left:-4px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),rgba(0,0,0,.25),rgba(255,255,255,.12),transparent)}
+.back{position:absolute;inset:0}
+.sheen{position:absolute;inset:0;background:linear-gradient(125deg,rgba(255,255,255,.16),transparent 38%,transparent 62%,rgba(0,0,0,.18))}
+.logo{position:absolute}
+.logo svg{width:100%;height:100%;display:block}
+.word{position:absolute;left:0;right:0;text-align:center;font-family:var(--body);font-weight:500;letter-spacing:.02em}
+.md{position:absolute;box-shadow:0 1px 0 rgba(255,255,255,.25) inset,0 6px 14px rgba(0,0,0,.35),0 0 0 1px rgba(0,0,0,.25)}
+.ln{position:absolute;border-radius:50%;background:radial-gradient(circle at 38% 35%,#3a4a6a 0 8%,#0c0e14 22%,#05060a 55%,#1b1d22 62%,#2b2e35 70%,#0b0c0f 74%);box-shadow:0 0 0 1px rgba(0,0,0,.6),0 3px 6px rgba(0,0,0,.45)}
+.fl{position:absolute;border-radius:50%;background:radial-gradient(circle,#fff6d8 0 30%,#d9c99a 60%,#8f8467);box-shadow:0 0 0 1px rgba(0,0,0,.3)}
+.lid{position:absolute;border-radius:50%;background:#16171b;box-shadow:inset 0 0 0 1px #333}
+.ant{position:absolute;left:0;right:0;height:2px;background:rgba(0,0,0,.18)}
+.btn{position:absolute;border-radius:3px}
+
+.hud{position:absolute;left:14px;right:14px;bottom:14px;display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center;pointer-events:none}
+.hud>*{pointer-events:auto}
+.group{display:flex;gap:4px;padding:4px;border-radius:99px;background:rgba(19,21,26,.78);backdrop-filter:blur(10px);border:1px solid var(--line);align-items:center}
+.group button{border:0;background:transparent;padding:7px 12px;border-radius:99px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.group button:hover{color:var(--fg)}
+.group button[aria-pressed="true"]{background:var(--fg);color:var(--ink)}
+.group label{font-family:var(--mono);font-size:11px;color:var(--mute);letter-spacing:.08em;text-transform:uppercase;padding-left:10px}
+input[type=range]{width:90px;accent-color:var(--accent)}
+.hint{position:absolute;top:14px;left:0;right:0;text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--mute);text-transform:uppercase;pointer-events:none}
+
+.rail{display:flex;align-items:stretch;gap:8px;padding-block:6px 18px}
+.arrow{flex:none;width:44px;border-radius:14px;border:1px solid var(--line);background:var(--panel);font-size:18px}
+.track{display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;flex:1;min-width:0;padding:2px}
+.track::-webkit-scrollbar{display:none}
+.yr{flex:none;scroll-snap-align:center;border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:10px 14px;text-align:left;min-width:112px;position:relative;transition:border-color .3s,background .3s}
+.yr small{display:block;font-family:var(--mono);font-size:11px;color:var(--mute);letter-spacing:.06em}
+.yr span{display:block;font-family:var(--display);font-stretch:85%;font-weight:600;font-size:14px;margin-top:3px;white-space:nowrap}
+.yr[aria-current="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,var(--panel))}
+.yr .dot{position:absolute;top:10px;right:10px;width:8px;height:8px;border-radius:50%}
+.bar{height:2px;background:var(--line);border-radius:2px;overflow:hidden;margin-top:-14px;margin-bottom:12px}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .5s,background .6s}
+
+@media (max-width:860px){
+  main{grid-template-columns:1fr}
+  .stage{order:-1;height:58vh;min-height:400px}
+  h1{font-size:46px}
+  .credit{font-size:10px;padding:6px 10px}
+  .brand span{display:none}
+}
+@media (prefers-reduced-motion:reduce){.fit,.glow,.bar i{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <div class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><path id="applePath" d="M16.37 1.43c0 1.14-.49 2.27-1.18 3.08-.74.9-1.99 1.57-2.99 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.57-2.27 1.21-2.98.8-.94 2.14-1.64 3.25-1.68.03.13.05.28.05.43zm4.56 15.71c-.03.07-.46 1.58-1.52 3.12-.94 1.34-1.94 2.71-3.43 2.71-1.52 0-1.9-.88-3.63-.88-1.7 0-2.3.91-3.67.91-1.38 0-2.33-1.26-3.43-2.8-1.29-1.82-2.32-4.63-2.32-7.28 0-4.28 2.8-6.55 5.55-6.55 1.45 0 2.68.95 3.6.95.87 0 2.22-1.01 3.9-1.01.61 0 2.89.06 4.37 2.19-.13.09-2.38 1.37-2.38 4.19 0 3.26 2.85 4.42 2.96 4.45z"/></svg>iPhone Evolution <span style="color:var(--mute);font-weight:400">· 2007 → 2026</span></div>
+    <div class="credit">Made by <b>Usairam Hassan</b></div>
+  </header>
+
+  <main>
+    <section class="info" aria-live="polite">
+      <div class="eyebrow"><span id="idx">Model 01 / 19</span><span id="yearTxt">2007</span><span class="tag" id="tag" hidden>Projected</span></div>
+      <h1 id="name">iPhone</h1>
+      <p class="lede" id="note"></p>
+      <dl>
+        <dt>Chip</dt><dd id="chip"></dd>
+        <dt>Display</dt><dd id="disp"></dd>
+        <dt>Camera</dt><dd id="cam"></dd>
+        <dt>Size</dt><dd id="size"></dd>
+      </dl>
+      <div class="swatches" id="sw"></div>
+    </section>
+
+    <section class="stage" id="stage" aria-label="3D model, drag to rotate">
+      <div class="bigyear" id="bigyear">2007</div>
+      <div class="glow"></div>
+      <div class="floor"></div>
+      <div class="hint">Drag to rotate · ← → to switch</div>
+      <div class="scene"><div class="ghost" id="ghost" hidden><span>2007 original</span></div><div class="fit" id="fit"><div class="rot" id="rot"><div class="phone" id="phone"></div></div></div></div>
+      <div class="hud">
+        <div class="group" role="group" aria-label="View">
+          <button id="vFront">Front</button><button id="vSide">Side</button><button id="vBack">Back</button>
+        </div>
+        <div class="group">
+          <button id="play" aria-pressed="true">Spin</button>
+          <label for="speed">Speed</label><input type="range" id="speed" min="2" max="40" value="14">
+          <button id="tour" aria-pressed="false">Tour</button>
+          <button id="cmp" aria-pressed="false">vs 2007</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div>
+    <div class="rail">
+      <button class="arrow" id="prev" aria-label="Previous model">←</button>
+      <div class="track" id="track"></div>
+      <button class="arrow" id="next" aria-label="Next model">→</button>
+    </div>
+    <div class="bar"><i id="prog"></i></div>
+  </div>
+</div>
+
+<script>
+const APPLE=document.getElementById('applePath').getAttribute('d');
+const C=(n,frame,back,fb)=>({n,frame,back,fb});
+const M=[
+ {n:'iPhone',y:2007,w:61,h:115,d:11.6,r:9,c:3.5,front:'home',sr:.62,cam:'orig',logoY:.33,word:1,band:'#151515',
+  colors:[C('Silver','#b5b8bc','#c9ccd0')],chip:'Samsung ARM11 · 412 MHz',disp:'3.5″ · 320×480',camT:'2 MP',
+  note:'An iPod, a phone and an internet communicator. Multi-touch glass replaced the keyboard, with an aluminium back and a black plastic antenna window.'},
+ {n:'iPhone 3G',y:2008,w:62.1,h:115.5,d:12.3,r:10,c:5.5,front:'home',sr:.62,cam:'orig',logoY:.33,word:1,
+  colors:[C('Black','#c7c9cc','#101012'),C('White','#c7c9cc','#f3f3f1')],chip:'Samsung ARM11 · 412 MHz',disp:'3.5″ · 320×480',camT:'2 MP',
+  note:'A curved plastic back, GPS, 3G networks and the App Store, which opened the phone to every developer.'},
+ {n:'iPhone 4',y:2010,w:58.6,h:115.2,d:9.3,r:8,c:0,front:'home',sr:.62,cam:'single',logoY:.33,word:1,
+  colors:[C('Black','#8e9196','#0c0c0e'),C('White','#8e9196','#f5f5f3','#f5f5f3')],chip:'Apple A4',disp:'3.5″ Retina · 640×960',camT:'5 MP + FaceTime front',
+  note:'Two sheets of glass around a stainless steel band that doubled as the antenna. The first Retina display.'},
+ {n:'iPhone 5',y:2012,w:58.6,h:123.8,d:7.6,r:8,c:0,front:'home',sr:.66,cam:'single',logoY:.33,word:1,strips:1,
+  colors:[C('Black & Slate','#2c2d30','#2c2d30'),C('White & Silver','#d9dadc','#dcdde0','#f5f5f3')],chip:'Apple A6',disp:'4″ Retina · 640×1136',camT:'8 MP',
+  note:'Taller 4-inch screen, all-aluminium body and the reversible Lightning connector.'},
+ {n:'iPhone 5c',y:2013,w:59.2,h:124.4,d:8.97,r:9,c:3,front:'home',sr:.66,cam:'single',logoY:.33,word:1,
+  colors:[C('Blue','#3fa2e0','#47a8e5'),C('Green','#97cf52','#a2d65a'),C('Yellow','#f0dc5c','#f5e56b'),C('Pink','#ef8296','#f28b9b'),C('White','#ececea','#f6f6f6')],
+  chip:'Apple A6',disp:'4″ Retina · 640×1136',camT:'8 MP',note:'Hard-coated polycarbonate in five bright colours.'},
+ {n:'iPhone 5s',y:2013,w:58.6,h:123.8,d:7.6,r:8,c:0,front:'home',sr:.66,cam:'single',logoY:.33,word:1,strips:1,tid:1,
+  colors:[C('Gold','#d8c5a5','#dcc9aa','#f5f5f3'),C('Space Gray','#4a4b4f','#4b4c50'),C('Silver','#d9dadc','#dcdde0','#f5f5f3')],chip:'Apple A7 · first 64-bit',disp:'4″ Retina · 640×1136',camT:'8 MP · True Tone flash',
+  note:'Touch ID put a fingerprint sensor under a sapphire home button.'},
+ {n:'iPhone 6',y:2014,w:67,h:138.1,d:6.9,r:10.5,c:3,front:'home',sr:.7,cam:'single',ring:1,logoY:.38,word:1,ant:1,tid:1,
+  colors:[C('Space Gray','#6b6c70','#6d6e71'),C('Silver','#dfe0e2','#e1e2e4','#f5f5f3'),C('Gold','#e1cfb5','#e3d1b8','#f5f5f3')],chip:'Apple A8',disp:'4.7″ Retina HD · 750×1334',camT:'8 MP',
+  note:'Bigger, thinner and rounded, with Apple Pay built in.'},
+ {n:'iPhone 7 Plus',y:2016,w:77.9,h:158.2,d:7.3,r:12,c:3,front:'home',sr:.7,cam:'dual-h',logoY:.42,ant:1,tid:1,
+  colors:[C('Jet Black','#0b0b0c','#060606'),C('Black','#2b2b2d','#2a2a2c'),C('Rose Gold','#e6c1b8','#e8c3bb','#f5f5f3')],chip:'A10 Fusion',disp:'5.5″ · 1920×1080',camT:'Dual 12 MP · Portrait mode',
+  note:'The first dual camera brought 2× optical zoom and Portrait mode. The headphone jack was removed.'},
+ {n:'iPhone X',y:2017,w:70.9,h:143.6,d:7.7,r:12,c:1.5,front:'notch',cam:'dual-v',logoY:.5,wp:'linear-gradient(160deg,#1c2a52,#6b3fa0 55%,#e0607e)',
+  colors:[C('Silver','#bfc0c2','#ecebe8'),C('Space Gray','#3a3a3c','#1c1c1e')],chip:'A11 Bionic',disp:'5.8″ OLED · 2436×1125',camT:'Dual 12 MP · TrueDepth',
+  note:'Edge-to-edge OLED, Face ID and the notch. The home button was gone.'},
+ {n:'iPhone XR',y:2018,w:75.7,h:150.9,d:8.3,r:13,c:1.5,front:'notch',cam:'xr',logoY:.5,wp:'linear-gradient(170deg,#ff8a5c,#e0335b)',
+  colors:[C('(PRODUCT)RED','#b80f2a','#c8102e'),C('Blue','#4a9bd1','#4fa3d8'),C('Yellow','#efcd44','#f3d34a'),C('Coral','#f26f59','#f7765f'),C('Black','#2a2a2c','#19191b'),C('White','#e6e6e4','#f2f2f0')],
+  chip:'A12 Bionic',disp:'6.1″ Liquid Retina LCD',camT:'12 MP',note:'Face ID in an aluminium body and six colours.'},
+ {n:'iPhone 11 Pro',y:2019,w:71.4,h:144,d:8.1,r:12,c:1.5,front:'notch',cam:'tri',logoY:.5,wp:'linear-gradient(170deg,#0f2b27,#3d6b58 60%,#a5c9a0)',
+  colors:[C('Midnight Green','#5a625c','#4e5851'),C('Gold','#e4d2bb','#e9d8c3'),C('Space Gray','#3b3b3d','#38383a'),C('Silver','#d3d4d6','#ecebe8')],chip:'A13 Bionic',disp:'5.8″ Super Retina XDR',camT:'Triple 12 MP · Night mode',
+  note:'A matte glass back and the triple-camera square.'},
+ {n:'iPhone 12',y:2020,w:71.5,h:146.7,d:7.4,r:11,c:0,front:'notch',cam:'diag',logoY:.5,wp:'linear-gradient(170deg,#0d1e3d,#2463a8 60%,#7dc0f0)',
+  colors:[C('Blue','#244f80','#1f4e79'),C('Green','#c9e3c2','#d8efd2'),C('Purple','#bdb3dd','#c9c1e6'),C('(PRODUCT)RED','#b00f28','#c8102e'),C('White','#e8e8e6','#f4f4f2'),C('Black','#232325','#1c1c1e')],
+  chip:'A14 Bionic',disp:'6.1″ Super Retina XDR',camT:'Dual 12 MP',note:'Flat edges came back, along with 5G, MagSafe and Ceramic Shield.'},
+ {n:'iPhone 14 Pro',y:2022,w:71.5,h:147.5,d:7.85,r:12,c:0,front:'island',cam:'tri',logoY:.5,wp:'linear-gradient(170deg,#1a1323,#6c4f8a 55%,#c9a7e6)',
+  colors:[C('Deep Purple','#4b4251','#594f63'),C('Gold','#e7d3b0','#f0dfc3'),C('Space Black','#2f2f31','#2b2b2d'),C('Silver','#d6d7d9','#eeeeec')],chip:'A16 Bionic',disp:'6.1″ ProMotion · Always-On',camT:'48 MP main · triple',
+  note:'The Dynamic Island turned the cutout into a live part of the interface.'},
+ {n:'iPhone 15 Pro',y:2023,w:70.6,h:146.6,d:8.25,r:12.5,c:.8,front:'island',cam:'tri',logoY:.5,wp:'linear-gradient(170deg,#1b1b1d,#56514a 55%,#bab4a9)',
+  colors:[C('Natural Titanium','#b4ae a3'.replace(' ',''),'#bab4a9'),C('Blue Titanium','#3c4250','#3f4552'),C('White Titanium','#d6d6d2','#e1e1dd'),C('Black Titanium','#3a3a3c','#333335')],chip:'A17 Pro · 3 nm',disp:'6.1″ ProMotion · Always-On',camT:'48 MP · 3× telephoto',
+  note:'A titanium frame, the Action button and USB‑C.'},
+ {n:'iPhone 16',y:2024,w:71.6,h:147.6,d:7.8,r:12,c:0,front:'island',cam:'dual-v',cc:1,logoY:.5,wp:'linear-gradient(170deg,#2b2f8a,#5b6ff0 55%,#b9c4ff)',
+  colors:[C('Ultramarine','#5b6fe0','#8fa2f5'),C('Teal','#5fb3ad','#85c9c4'),C('Pink','#ee8fbb','#f3a6c9'),C('White','#e8e8e6','#f4f4f2'),C('Black','#2a2a2c','#2f3033')],chip:'A18',disp:'6.1″ Super Retina XDR',camT:'48 MP Fusion + Ultra Wide',
+  note:'The vertical camera pill, Camera Control and Apple Intelligence.'},
+ {n:'iPhone 17 Pro',y:2025,w:71.9,h:150,d:8.75,r:12.5,c:.8,front:'island',cam:'plateau',cc:1,logoY:.62,wp:'linear-gradient(170deg,#3a1a0d,#c2531f 55%,#ffb37a)',
+  colors:[C('Cosmic Orange','#e0692f','#e8743b'),C('Deep Blue','#2b3a55','#2f3f5c'),C('Silver','#dcdcda','#e7e7e5')],chip:'A19 Pro · vapor chamber',disp:'6.3″ ProMotion · 3000 nits',camT:'Triple 48 MP · 8× optical-quality',
+  note:'An aluminium unibody and a full-width camera plateau.'},
+ {n:'iPhone Air',y:2025,w:74.7,h:156.2,d:5.64,r:13,c:.5,front:'island',cam:'air',cc:1,logoY:.5,wp:'linear-gradient(170deg,#9cc3e6,#e8f1fa)',
+  colors:[C('Sky Blue','#bcd3e6','#cfe0ee'),C('Light Gold','#e0d0b4','#eadcc4'),C('Cloud White','#e9e8e4','#f2f1ee'),C('Space Black','#2a2a2c','#222224')],chip:'A19 Pro',disp:'6.5″ ProMotion',camT:'48 MP Fusion',
+  note:'5.6 mm thin. Titanium frame, a single camera and a slim plateau.'},
+ {n:'iPhone 18 Pro',y:2026,w:71.9,h:150,d:8.8,r:12.5,c:.8,front:'island-sm',cam:'plateau',cc:1,logoY:.62,tag:'Projected',wp:'linear-gradient(170deg,#1a0508,#6b1f2e 55%,#e37b8b)',
+  colors:[C('Dark Cherry','#4f1520','#5a1a24'),C('Deep Blue','#2b3a55','#2f3f5c'),C('Silver','#dcdcda','#e7e7e5')],chip:'A20 Pro · 2 nm (reported)',disp:'6.3″ · smaller Dynamic Island',camT:'48 MP · variable aperture (reported)',
+  note:'Shown from pre-launch reports: under-display Face ID shrinks the island, and the main camera gains a variable aperture.'},
+ {n:'iPhone Duo',y:2026,w:118,h:152,d:5,r:13,c:.5,front:'fold',cam:'duo',cc:1,logoY:.5,logoX:.75,hinge:1,tag:'Concept',wp:'linear-gradient(120deg,#0b1020,#2b3f8a 40%,#c06bd8 75%,#ffb37a)',
+  colors:[C('Black Titanium','#2c2c2e','#2a2a2c'),C('Silver Titanium','#cfcfcd','#dcdcda')],chip:'A20 Pro',disp:'7.8″ inner · 5.5″ cover (concept)',camT:'Dual 48 MP',
+  note:'An imagined book-style foldable: two phones of screen that close into one. Shown unfolded.'}
+];
+
+const S=2.5, $=id=>document.getElementById(id);
+const phone=$('phone'), rot=$('rot'), fit=$('fit'), stage=$('stage');
+let cur=0, colIdx=0, ry=-25, rx=-6, target=null, playing=!matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ICONS=['#5ac15a','#3a8ef6','#f2b234','#f2504b','#9b59d6','#1ec7d8','#f37f2e','#e4e4e4','#2ec4a0','#ff5e8a','#6c7a89','#ffd23f','#4b6cf2','#38b24a','#ff9f1c','#ae6cf0'];
+
+const px=v=>v.toFixed(1)+'px';
+const box=(cls,x,y,w,h,extra='')=>`<div class="${cls}" style="left:${px(x)};top:${px(y)};width:${px(w)};height:${px(h)};${extra}"></div>`;
+const lens=(x,y,s)=>`<i class="ln" style="left:${px(x-s/2)};top:${px(y-s/2)};width:${px(s)};height:${px(s)}"></i>`;
+const flash=(x,y,s)=>`<i class="fl" style="left:${px(x-s/2)};top:${px(y-s/2)};width:${px(s)};height:${px(s)}"></i>`;
+const lid=(x,y,s)=>`<i class="lid" style="left:${px(x-s/2)};top:${px(y-s/2)};width:${px(s)};height:${px(s)}"></i>`;
+const appleSvg=f=>`<svg viewBox="0 0 24 24"><path d="${APPLE}" fill="${f}"/></svg>`;
+const lum=h=>{const n=parseInt(h.slice(1),16);return((n>>16)*.3+((n>>8)&255)*.59+(n&255)*.11)/255};
+
+function homeScreen(m,W,H){
+  const g=W*.07, cell=(W-g*5)/4; let icons='';
+  for(let i=0;i<16;i++) icons+=`<i style="background:${ICONS[i]}"></i>`;
+  let dock=''; for(let i=0;i<4;i++) dock+=`<i style="background:${ICONS[(i*5+3)%16]}"></i>`;
+  return `<div class="wp" style="background:linear-gradient(180deg,#0e1a33,#27406b)"></div>
+   <div class="sb" style="font-size:${px(W*.06)};padding:${px(W*.02)} ${px(W*.04)}"><span>●●●●</span><span>9:41</span><span>▮</span></div>
+   <div class="grid" style="left:${px(g)};right:${px(g)};top:${px(H*.08)};gap:${px(g*1.1)} ${px(g)}">${icons}</div>
+   <div class="grid" style="left:${px(g)};right:${px(g)};bottom:${px(g)};gap:${px(g)};padding-top:${px(g*.6)};border-top:1px solid rgba(255,255,255,.15)">${dock}</div>`;
+}
+function lockScreen(m,W,H){
+  return `<div class="wp" style="background:${m.wp}"></div>
+   <div class="dt" style="top:${px(H*.1)};font-size:${px(W*.055)}">Friday, 30 October</div>
+   <div class="clk" style="top:${px(H*.12)};font-size:${px(W*.27)}">9:41</div>`;
+}
+function front(m,col,W,H,R){
+  const fb=col.fb||'#0b0b0c';
+  if(m.front==='home'){
+    const sx=W*.065, sh=H*m.sr, st=(H-sh)/2, sw=W-2*sx, bd=W*.17;
+    const spk=`<div class="spk" style="top:${px(st*.42)};width:${px(W*.17)};height:${px(W*.025)}"></div>`;
+    const hbBg=m.tid?`background:${col.frame};box-shadow:inset 0 0 0 ${px(W*.012)} ${col.frame},inset 0 0 0 ${px(W*.02)} ${fb==='#0b0b0c'?'#111':'#e9e9e7'}`:`background:${fb}`;
+    return `<div class="bz" style="background:${fb}">${spk}
+      <div class="scr" style="left:${px(sx)};top:${px(st)};width:${px(sw)};height:${px(sh)}">${homeScreen(m,sw,sh)}</div>
+      <div class="hb ${m.tid?'tid':''}" style="width:${px(bd)};height:${px(bd)};left:${px((W-bd)/2)};top:${px(st+sh+(H-st-sh-bd)/2)};${hbBg}"></div></div>`;
+  }
+  const b=W*.035, sw=W-2*b, sh=H-2*b, sr=Math.max(0,R-b);
+  let cut='';
+  if(m.front==='notch') cut=`<div class="notch" style="top:0;width:${px(sw*.46)};height:${px(sw*.075)};border-radius:0 0 ${px(sw*.05)} ${px(sw*.05)}"></div>`;
+  if(m.front==='island') cut=`<div class="isl" style="top:${px(sw*.03)};width:${px(sw*.31)};height:${px(sw*.09)}"></div>`;
+  if(m.front==='island-sm') cut=`<div class="isl" style="top:${px(sw*.03)};width:${px(sw*.2)};height:${px(sw*.085)}"></div>`;
+  if(m.front==='fold') cut=`<div class="crease"></div><div class="punch" style="left:75%;top:${px(sw*.03)};width:${px(sw*.035)};height:${px(sw*.035)}"></div>`;
+  const content=m.front==='fold'?lockScreen(m,sw/2,sh).replace('class="dt"','class="dt" style="left:50%"').replace('class="clk"','class="clk" style="left:50%"'):lockScreen(m,sw,sh);
+  return `<div class="bz" style="background:#050505"><div class="scr" style="left:${px(b)};top:${px(b)};width:${px(sw)};height:${px(sh)};border-radius:${px(sr)}">${content}${cut}</div></div>`;
+}
+function camera(m,col,W){
+  const mod=(x,y,w,h,r)=>box('md',x*W,y*W,w*W,h*W,`border-radius:${px(r*W)};background:color-mix(in srgb,${col.back},${lum(col.back)>.5?'#000 6%':'#fff 10%'})`);
+  const L=(x,y,s)=>lens(x*W,y*W,s*W), F=(x,y,s)=>flash(x*W,y*W,s*W), D=(x,y,s)=>lid(x*W,y*W,s*W);
+  switch(m.cam){
+    case 'orig': return L(.12,.12,.075);
+    case 'single': return (m.ring?box('md',.065*W,.065*W,.13*W,.13*W,`border-radius:50%;background:${col.frame}`):'')+L(.13,.13,.1)+F(.27,.13,.045);
+    case 'dual-h': return mod(.05,.05,.42,.2,.1)+L(.15,.15,.14)+L(.37,.15,.14)+F(.55,.15,.05);
+    case 'dual-v': return mod(.06,.06,.2,.4,.1)+L(.16,.16,.14)+L(.16,.36,.14)+F(.33,.2,.05);
+    case 'xr': return mod(.06,.06,.32,.32,.08)+L(.16,.16,.15)+F(.3,.16,.05)+F(.3,.3,.02);
+    case 'diag': return mod(.06,.06,.36,.36,.085)+L(.15,.15,.14)+L(.27,.29,.14)+F(.33,.13,.05);
+    case 'tri': return mod(.05,.05,.45,.45,.11)+L(.155,.155,.17)+L(.155,.345,.17)+L(.34,.25,.17)+F(.34,.1,.05)+D(.34,.4,.05);
+    case 'plateau': return mod(.03,.03,.94,.48,.13)+L(.17,.15,.18)+L(.17,.36,.18)+L(.38,.255,.18)+F(.82,.17,.06)+D(.82,.34,.05);
+    case 'air': return mod(.03,.04,.94,.2,.1)+L(.15,.14,.14)+lens(.3*W,.14*W,.06*W)+F(.84,.14,.05);
+    case 'duo': return mod(.02,.025,.46,.16,.08)+L(.09,.105,.12)+L(.22,.105,.12)+F(.42,.105,.035);
+  }
+  return '';
+}
+function back(m,col,W,H){
+  let h='';
+  if(m.band) h+=box('',0,H*.82,W,H*.18,`position:absolute;background:${m.band}`);
+  if(m.strips){const s=col.fb==='#f5f5f3'?'#f3f3f1':'#0f0f10';h+=box('',0,0,W,H*.125,`position:absolute;background:${s}`)+box('',0,H*.875,W,H*.125,`position:absolute;background:${s}`)}
+  if(m.ant) h+=`<div class="ant" style="top:${px(H*.065)}"></div><div class="ant" style="top:${px(H*.935)}"></div>`;
+  if(m.hinge) h+=`<div class="crease" style="opacity:.8"></div>`;
+  const dark=lum(col.back)<.45, lf=m.cam==='orig'&&m.n==='iPhone'?'#e8e8e8':(dark?'rgba(255,255,255,.82)':'rgba(0,0,0,.55)');
+  const Ls=Math.min(W,H*.5)*.2*(m.logoX?.5:1)*(m.logoX?2:1)*(m.hinge?.55:1);
+  const lx=W*(m.logoX||.5)-Ls/2, ly=H*m.logoY-Ls/2;
+  h+=`<div class="logo" style="left:${px(lx)};top:${px(ly)};width:${px(Ls)};height:${px(Ls)}">${appleSvg(m.n==='iPhone'?'#3a3a3a':lf)}</div>`;
+  if(m.word) h+=`<div class="word" style="top:${px(H*.6)};font-size:${px(W*.06)};color:${m.n==='iPhone'?'#3a3a3a':lf}">iPhone</div>`;
+  h+=camera(m,col,W);
+  return `<div class="back" style="background:${col.back}">${h}<div class="sheen"></div></div>`;
+}
+function buttons(m,col,w,h,d){
+  const bw=d*.5, c=color(col.frame,-18), list=[];
+  const side=(x,y,len)=>list.push(box('btn',x-bw/2,y,bw,len,`background:${c};transform:rotateY(90deg)`));
+  const L=-1, R=w+1;
+  side(L,h*.12,h*.04); side(L,h*.2,h*.07); side(L,h*.29,h*.07); side(R,h*.22,h*.1);
+  if(m.cc) side(R,h*.58,h*.07);
+  return list.join('');
+}
+function color(hex,amt){const n=parseInt(hex.slice(1),16);const f=v=>Math.max(0,Math.min(255,v+amt));return `rgb(${f(n>>16)},${f((n>>8)&255)},${f(n&255)})`}
+
+function build(){
+  const m=M[cur], col=m.colors[colIdx], w=m.w*S, h=m.h*S, d=m.d*S, r=m.r*S, c=(m.c||0)*S, N=16;
+  phone.style.width=px(w); phone.style.height=px(h);
+  let html='';
+  for(let i=0;i<N;i++){
+    const t=-1+2*i/(N-1), ins=c*(1-Math.sqrt(Math.max(0,1-t*t))), shade=Math.round(8+30*Math.abs(t));
+    html+=box('',ins,ins,w-2*ins,h-2*ins,`border-radius:${px(Math.max(0,r-ins))};transform:translateZ(${px(t*d/2)});background:color-mix(in srgb,${col.frame},#000 ${shade}%)`);
+  }
+  const W=w-2*c, H=h-2*c, R=Math.max(0,r-c);
+  html+=`<div class="face" style="left:${px(c)};top:${px(c)};width:${px(W)};height:${px(H)};border-radius:${px(R)};transform:translateZ(${px(d/2+.6)})">${front(m,col,W,H,R)}</div>`;
+  html+=`<div class="face" style="left:${px(c)};top:${px(c)};width:${px(W)};height:${px(H)};border-radius:${px(R)};transform:rotateY(180deg) translateZ(${px(d/2+.6)})">${back(m,col,W,H)}</div>`;
+  html+=buttons(m,col,w,h,d);
+  phone.innerHTML=html;
+  document.documentElement.style.setProperty('--accent',col.back==='#ecebe8'||lum(col.back)>.8||lum(col.back)<.12?(m.wp?m.wp.match(/#[0-9a-f]{6}/gi).slice(-1)[0]:'#e8743b'):col.back);
+  resize();
+}
+function info(){
+  const m=M[cur], col=m.colors[colIdx], o=M[0];
+  $('idx').textContent=`Model ${String(cur+1).padStart(2,'0')} / ${M.length}`;
+  $('yearTxt').textContent=m.y; $('bigyear').textContent=m.y; $('name').textContent=m.n; $('note').textContent=m.note;
+  $('chip').textContent=m.chip; $('disp').textContent=m.disp; $('cam').textContent=m.camT;
+  const dh=Math.round((m.h/o.h-1)*100);
+  $('size').textContent=`${m.h} × ${m.w} × ${m.d} mm`+(cur?` · ${dh>=0?'+':''}${dh}% taller than 2007`:'');
+  $('tag').hidden=!m.tag; $('tag').textContent=m.tag||'';
+  $('sw').innerHTML=m.colors.map((c,i)=>`<button class="sw" aria-label="${c.n}" aria-pressed="${i===colIdx}" style="background:linear-gradient(135deg,${c.back} 50%,${c.frame} 50%)" data-i="${i}"></button>`).join('')+`<span class="swname">${col.n}</span>`;
+  document.querySelectorAll('.yr').forEach((b,i)=>b.setAttribute('aria-current',i===cur));
+  const a=document.querySelectorAll('.yr')[cur]; a&&a.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});
+  $('prog').style.width=((cur+1)/M.length*100)+'%';
+  const g=$('ghost'); g.style.width=px(o.w*S*sc); g.style.height=px(o.h*S*sc); g.style.marginLeft=px(-o.w*S*sc/2); g.style.marginTop=px(-o.h*S*sc/2); g.style.borderRadius=px(o.r*S*sc);
+}
+let sc=1;
+function resize(){
+  const m=M[cur], sh=stage.clientHeight-110, sw=stage.clientWidth-40;
+  sc=Math.min(1,sh/(m.h*S),sw/(m.w*S),sh/(M[16].h*S)*1.0);
+  fit.style.transform=fit.classList.contains('swap')?'':`scale(${sc})`;
+  fit.style.setProperty('--s',sc);
+}
+function go(i,keepColor){
+  cur=(i+M.length)%M.length; if(!keepColor) colIdx=0;
+  fit.classList.add('swap'); fit.style.transform='';
+  setTimeout(()=>{build();info();fit.classList.remove('swap');resize()},280);
+}
+$('track').innerHTML=M.map((m,i)=>`<button class="yr" data-i="${i}"><i class="dot" style="background:${m.colors[0].back}"></i><small>${m.y}${m.tag?' · '+m.tag:''}</small><span>${m.n}</span></button>`).join('');
+$('track').onclick=e=>{const b=e.target.closest('.yr');if(b)go(+b.dataset.i)};
+$('sw').onclick=e=>{const b=e.target.closest('.sw');if(b){colIdx=+b.dataset.i;build();info()}};
+$('prev').onclick=()=>go(cur-1); $('next').onclick=()=>go(cur+1);
+const snap=a=>{const base=Math.round(ry/360)*360;target=base+a;if(target-ry>180)target-=360;if(ry-target>180)target+=360};
+$('vFront').onclick=()=>snap(0); $('vSide').onclick=()=>snap(-90); $('vBack').onclick=()=>snap(180);
+const setPlay=v=>{playing=v;$('play').setAttribute('aria-pressed',v)};
+$('play').onclick=()=>setPlay(!playing);
+let tourT=null;
+$('tour').onclick=()=>{const on=!tourT;$('tour').setAttribute('aria-pressed',on);if(on){setPlay(true);tourT=setInterval(()=>go(cur+1),7000)}else{clearInterval(tourT);tourT=null}};
+$('cmp').onclick=()=>{const g=$('ghost');g.hidden=!g.hidden;$('cmp').setAttribute('aria-pressed',!g.hidden)};
+addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;if(e.key==='ArrowRight')go(cur+1);if(e.key==='ArrowLeft')go(cur-1);if(e.key===' '&&e.target===document.body){e.preventDefault();setPlay(!playing)}});
+let drag=null, resumeT=null;
+stage.addEventListener('pointerdown',e=>{if(e.target.closest('.hud'))return;drag={x:e.clientX,y:e.clientY,was:playing};playing=false;target=null;stage.setPointerCapture(e.pointerId)});
+stage.addEventListener('pointermove',e=>{if(!drag)return;ry+=(e.clientX-drag.x)*.45;rx=Math.max(-35,Math.min(35,rx-(e.clientY-drag.y)*.3));drag.x=e.clientX;drag.y=e.clientY});
+const end=()=>{if(!drag)return;const w=drag.was;drag=null;clearTimeout(resumeT);resumeT=setTimeout(()=>{if(w)playing=true},1600)};
+stage.addEventListener('pointerup',end); stage.addEventListener('pointercancel',end);
+let last=performance.now();
+function tick(t){
+  const dt=Math.min(.05,(t-last)/1000); last=t;
+  if(target!==null){ry+=(target-ry)*Math.min(1,dt*6);if(Math.abs(target-ry)<.2){ry=target;target=null;setPlay(false)}}
+  else if(playing) ry+=dt*(+$('speed').value);
+  if(!drag) rx+=(-6-rx)*Math.min(1,dt*2);
+  rot.style.transform=`rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
+  requestAnimationFrame(tick);
+}
+addEventListener('resize',()=>{resize();info()});
+setPlay(playing); build(); info(); requestAnimationFrame(tick);
+</script>
+</body>
+</html>
