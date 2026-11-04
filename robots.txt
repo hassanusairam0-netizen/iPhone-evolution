@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://iphone-evolution.vercel.app/sitemap.xml
+Sitemap: https://iphone-evolution-zeta.vercel.app/sitemap.xml
