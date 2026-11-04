@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://iphone-evolution.vercel.app/sitemap.xml
